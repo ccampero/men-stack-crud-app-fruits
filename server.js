@@ -12,16 +12,30 @@ mongoose.connection.on("connected", () => {
 
 const Fruit = require("./models/fruit.js");
 
-//GET /
-app.get("/", async (req, res) => {
-    res.send("hello, friend!");
-  })
- 
+//middleware
+app.use(express.urlencoded({ extended: false }));
+
+
+ //GET /
   app.get("/", async (req, res) => {
     res.render("index.ejs");
   });
 
- 
+//Get fruits new/ 
+ app.get("/fruits/new", (req, res) => {
+    res.render("fruits/new.ejs");
+  });
+
+  // POST /fruits
+app.post("/fruits", async (req, res) => {
+    if (req.body.isReadyToEat === "on") {
+        req.body.isReadyToEat = true;
+      } else {
+        req.body.isReadyToEat = false;
+      }
+      await Fruit.create(req.body);
+    res.redirect("/fruits/new");
+  });
 
 app.listen(3000, () => {
   console.log("Listening on port 3000")
