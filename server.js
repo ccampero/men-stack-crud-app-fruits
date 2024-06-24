@@ -1,22 +1,10 @@
 
-// server.js
-const app = express();
-const mongoose = require('mongoose');
-const methodOverride = require("method-override"); // new
-const morgan = require("morgan"); //new
-
-// DB connection code
-
-// Mount it along with our other middleware, ABOVE the routes
-app.use(express.urlencoded({ extended: false }));
-app.use(methodOverride("_method")); // new
-app.use(morgan("dev")); //new
-
-// routes below
 const dotenv = require("dotenv"); // require package
 dotenv.config(); 
 const express = require("express");
 const mongoose = require("mongoose");
+const methodOverride = require("method-override"); // new
+const morgan = require("morgan"); //new
 
 const app = express();
 mongoose.connect(process.env.MONGODB_URI);
@@ -29,6 +17,10 @@ const Fruit = require("./models/fruit.js");
 
 //middleware
 app.use(express.urlencoded({ extended: false }));
+app.use(methodOverride("_method")); 
+app.use(morgan("dev")); 
+
+
 
 
  //GET /
@@ -39,8 +31,7 @@ app.use(express.urlencoded({ extended: false }));
   // GET /fruits
 app.get("/fruits", async (req, res) => {
   const allFruits = await Fruit.find();
-  console.log(allFruits);
-  res.render('fruits/index.ejs', { fruits: allFruits });
+    res.render('fruits/index.ejs', { fruits: allFruits });
 });
 
 
@@ -56,6 +47,7 @@ app.get("/fruits", async (req, res) => {
   });
   
   
+  
   // POST /fruits
 app.post("/fruits", async (req, res) => {
     if (req.body.isReadyToEat === "on") {
@@ -67,6 +59,12 @@ app.post("/fruits", async (req, res) => {
     res.redirect("/fruits");
   });
 
+  
+  app.delete("/fruits/:fruitId", async (req, res) => {
+    await Fruit.findByIdAndDelete(req.params.fruitId);
+    res.redirect("/fruits");
+  });
+  
 app.listen(3000, () => {
   console.log("Listening on port 3000")
 });
